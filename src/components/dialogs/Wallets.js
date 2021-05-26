@@ -22,7 +22,23 @@ import { FaUserCircle } from 'react-icons/fa';
 import { networks } from '../../data/networks';
 
 export default function Wallets() {
-    const { setProvider, wallet, isWalletConnected, walletModalIsOpen, networkModalIsOpen, toggleWalletModal, toggleNetworkModal, setWalletModal, setBalance } = useStore();
+    const { setProvider, network, wallet, isWalletConnected, walletModalIsOpen, networkModalIsOpen, toggleWalletModal, toggleNetworkModal, setWalletModal, setNetwork } = useStore();
+
+    useEffect(async () => {
+        await getDefaultProvider();
+    }, []);
+
+    async function getDefaultProvider() {
+        await window.ethereum.enable();
+        if (network == null || network == undefined) {
+            const networkItem = networks.find(i => i.code === "mumbai");
+            
+            let provider = null;                        
+            const infuraKey = process.env.REACT_APP_INFURA_API_KEY;
+            provider = new ethers.providers.JsonRpcProvider(networkItem.rpcUrl.replace("[INFURA_KEY]",infuraKey));
+            setProvider(provider, null, null, networkItem, 0);
+        }
+    }
 
     async function connectMetamask(net)
     {

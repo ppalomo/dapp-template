@@ -9,25 +9,26 @@ import {
     VStack,
   } from '@chakra-ui/react';
 import useStore from '../../store';
-import { useContract } from '../../hooks/contractHooks';
+import { useContract, useAdminContract } from '../../hooks/contractHooks';
 
 export default function Home (props) {
     const { isWalletConnected } = useStore();
     const greeterContract = useContract("Greeter");
+    const greeterAdminContract = useAdminContract("Greeter");
     const [greeting, setGreetingValue] = useState();
     const [contractGreeting, setContractGreeting] = useState();
 
     useEffect(async () => {
-        if (isWalletConnected)
+        if (greeterAdminContract)
             await fetchGreeting();
         else
-            setContractGreeting("Disconnected")
-    }, [isWalletConnected]);
+            setContractGreeting("Disconnected");
+    }, [greeterAdminContract]);
 
     async function fetchGreeting() {
         try {
-            if(greeterContract != null) {
-                const data = await greeterContract.greet();                
+            if(greeterAdminContract != null) {
+                const data = await greeterAdminContract.greet();                
                 console.log('data: ', data);
                 setContractGreeting(data);
             }

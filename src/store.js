@@ -22,9 +22,10 @@ const useStore = create(set => ({
         wallet: wallet,
         network: network,
         balance: balance,
-        isWalletConnected: (provider != null)
+        isWalletConnected: (signer != null)
     })),
     setBalance: (balance) => set(() => ({ balance: balance })),
+    setNetwork: (network) => set(() => ({ network: network })),
     setPageSelected: (page) => set(() => ({ pageSelected: page })),
     toggleNetworkModal: () => set(state => ({ networkModalIsOpen: !state.networkModalIsOpen })),
     toggleWalletModal: () => set(state => ({ walletModalIsOpen: !state.walletModalIsOpen })),

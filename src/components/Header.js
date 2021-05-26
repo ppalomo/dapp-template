@@ -27,28 +27,23 @@ import { FaDiscord, FaMoon, FaSun, FaTwitter, FaBars } from 'react-icons/fa';
 import { truncate } from '../utils/stringsHelper';
 import useStore from '../store';
 import { topMenuItems } from '../data/menuItems';
+import { networks } from '../data/networks';
 
 //#endregion
 
 export default function Header (props) {
     const { colorMode, toggleColorMode } = useColorMode();
-    const { isWalletConnected, wallet, balance, setBalance, signer, network, toggleWalletModal, toggleNetworkModal, pageSelected } = useStore();
+    const { isWalletConnected, wallet, balance, setBalance, signer, network, toggleWalletModal, toggleNetworkModal, pageSelected, setNetwork } = useStore();
     const borderColor = useColorModeValue("border.100", "border.900");
     const textColor = useColorModeValue("text.100", "text.900");
     const addressBg = useColorModeValue("border.100", "border.900");
 
     // useEffect(async () => {
-    //     if (isWalletConnected) {
-    //         await getWalletBalance();
-    //     }            
-    // }, [isWalletConnected]);
-
-    // async function getWalletBalance() {
-    //     if (signer != null) {
-    //         const b = await signer.getBalance();
-    //         setBalance(b);
+    //     if (network == null || network == undefined) {
+    //         const networkItem = networks.find(i => i.code === "rinkeby");
+    //         setNetwork(networkItem);
     //     }
-    // }
+    // }, [network]);
 
     return(
         <>
@@ -107,55 +102,55 @@ export default function Header (props) {
                             Connect wallet
                         </Button>
                     :
-                        <>
-
-                            <Button 
-                                p={2}
-                                variant="outline" 
-                                bg="transparent" 
-                                borderColor={borderColor} 
-                                onClick={() => toggleWalletModal()}>
-                                <HStack spacing="10px">
-                                    <Flex pl={2}>
-                                        <Text
-                                            color={textColor}
-                                            fontSize="sm">                                    
-                                            {balance != null ? Math.round(utils.formatEther(balance) * 1e3) / 1e3 + ' ' + network.symbol : ""}
-                                        </Text>
-                                    </Flex>
-                                    <Flex 
-                                        bg={addressBg}
-                                        border="1px"
-                                        borderColor={borderColor}
-                                        p={1.5} rounded="md"
-                                        position="relative">
-                                        <Text
-                                            color={textColor}
-                                            fontSize="sm">                                    
-                                            {truncate(wallet, 15, '...')}
-                                        </Text>
-                                    </Flex>
-                                </HStack>
-                            </Button>
-
-                            <Button 
-                                variant="outline" 
-                                bg="transparent" 
-                                borderColor={borderColor}
-                                onClick={() => toggleNetworkModal()}>
-                                <HStack spacing="10px">
-                                    <Image 
-                                        src={`images/${network.icon}`} 
-                                        h="20px" objectFit="cover" />
-                                    <Text 
-                                        fontSize="md" 
-                                        color={textColor}>
-                                        {network.name}                                    
+                        <Button 
+                            p={2}
+                            variant="outline" 
+                            bg="transparent" 
+                            borderColor={borderColor} 
+                            onClick={() => toggleWalletModal()}>
+                            <HStack spacing="10px">
+                                <Flex pl={2}>
+                                    <Text
+                                        color={textColor}
+                                        fontSize="sm">                                    
+                                        {balance != null ? Math.round(utils.formatEther(balance) * 1e3) / 1e3 + ' ' + network.symbol : ""}
                                     </Text>
-                                </HStack>
-                            </Button>
+                                </Flex>
+                                <Flex 
+                                    bg={addressBg}
+                                    border="1px"
+                                    borderColor={borderColor}
+                                    p={1.5} rounded="md"
+                                    position="relative">
+                                    <Text
+                                        color={textColor}
+                                        fontSize="sm">                                    
+                                        {truncate(wallet, 15, '...')}
+                                    </Text>
+                                </Flex>
+                            </HStack>
+                        </Button>
+                    }
 
-                        </>
+                    { network ?
+                    <Button 
+                        variant="outline" 
+                        bg="transparent" 
+                        borderColor={borderColor}
+                        onClick={() => toggleNetworkModal()}>
+                        <HStack spacing="10px">
+                            <Image 
+                                src={`images/${network.icon}`} 
+                                h="20px" objectFit="cover" />
+                            <Text 
+                                fontSize="md" 
+                                color={textColor}>
+                                {network.name}                                    
+                            </Text>
+                        </HStack>
+                    </Button>
+                    :
+                    <></>
                     }
 
                     <IconButton
@@ -266,16 +261,14 @@ export default function Header (props) {
                 borderColor={borderColor}>
 
                 {!isWalletConnected ?
-                    <Button 
-                        variant="outline" 
-                        bg="transparent" 
-                        borderColor={borderColor}
-                        onClick={() => toggleWalletModal()}>
-                        Connect wallet
-                    </Button>
-                :
-                    <>
-
+                        <Button 
+                            variant="outline" 
+                            bg="transparent" 
+                            borderColor={borderColor}
+                            onClick={() => toggleWalletModal()}>
+                            Connect wallet
+                        </Button>
+                    :
                         <Button 
                             p={2}
                             variant="outline" 
@@ -304,26 +297,28 @@ export default function Header (props) {
                                 </Flex>
                             </HStack>
                         </Button>
+                    }
 
-                        <Button 
-                            variant="outline" 
-                            bg="transparent" 
-                            borderColor={borderColor}
-                            onClick={() => toggleNetworkModal()}>
-                            <HStack spacing="10px">
-                                <Image 
-                                    src={`images/${network.icon}`} 
-                                    h="20px" objectFit="cover" />
-                                <Text 
-                                    fontSize="md" 
-                                    color={textColor}>
-                                    {network.name}                                    
-                                </Text>
-                            </HStack>
-                        </Button>
-
-                    </>
-                }
+                    { network ?
+                    <Button 
+                        variant="outline" 
+                        bg="transparent" 
+                        borderColor={borderColor}
+                        onClick={() => toggleNetworkModal()}>
+                        <HStack spacing="10px">
+                            <Image 
+                                src={`images/${network.icon}`} 
+                                h="20px" objectFit="cover" />
+                            <Text 
+                                fontSize="md" 
+                                color={textColor}>
+                                {network.name}                                    
+                            </Text>
+                        </HStack>
+                    </Button>
+                    :
+                    <></>
+                    }
 
             </Flex>
 
