@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ethers } from 'ethers';
 import {
     Modal,
@@ -16,12 +16,14 @@ import {
 import MetaMaskOnboarding from '@metamask/onboarding';
 import WalletOption from './WalletOption';
 import NetworkOption from './NetworkOption';
+import AlertMessage from './AlertMessage';
 import useStore from '../../store';
 import { truncate } from '../../utils/stringsHelper';
 import { FaUserCircle } from 'react-icons/fa';
 import { networks } from '../../data/networks';
 
 export default function Wallets() {
+    const [isWrongNetworkAlertOpen, setIsWrongNetworkAlertOpen] = useState(false);
     const { setProvider, network, wallet, isWalletConnected, walletModalIsOpen, networkModalIsOpen, toggleWalletModal, toggleNetworkModal, setWalletModal, setNetwork } = useStore();
 
     useEffect(async () => {
@@ -42,7 +44,6 @@ export default function Wallets() {
 
     async function connectMetamask(net)
     {
-        // console.log(`Network: ${net}`);
         let provider = null;
         await window.ethereum.enable();
         if (net == "default") {
@@ -51,23 +52,27 @@ export default function Wallets() {
             provider = new ethers.providers.Web3Provider(window.ethereum, net);
         }
 
-        const signer = provider.getSigner();
-        const wallet = await signer.getAddress();
         const network = await provider.getNetwork();
         const networkItem = networks.find(i => i.chainId === network.chainId);
-        const bal = await signer.getBalance();
-
-        setProvider(provider, signer, wallet, networkItem, bal);
+        if (networkItem && networkItem.enabled)
+        {
+            const signer = provider.getSigner();
+            const wallet = await signer.getAddress();        
+            const bal = await signer.getBalance();    
+            setProvider(provider, signer, wallet, networkItem, bal);            
+    
+            provider.removeAllListeners("network");
+            provider.on("network", (newNetwork, oldNetwork) => {
+                connectMetamask("default");
+            });
+    
+            window.ethereum.on('accountsChanged', function (accounts) {
+                connectMetamask("default");
+            });
+        } else {
+            setIsWrongNetworkAlertOpen(true);
+        }
         setWalletModal(false);
-
-        provider.removeAllListeners("network");
-        provider.on("network", (newNetwork, oldNetwork) => {
-            connectMetamask("default");
-        });
-
-        window.ethereum.on('accountsChanged', function (accounts) {
-            connectMetamask("default");
-        });
     }
 
     function disconnectWallet() {
@@ -150,30 +155,14 @@ export default function Wallets() {
                     <ModalHeader>Select a Network</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                        <WalletOption 
-                            name="Ethereum Mainnet"
-                            image="images/eth-icon.svg"
-                            onClick={() => handleNetworkSelected("mainnet")} />
-                        <WalletOption 
-                            name="Rinkeby Testnet"
-                            image="images/eth-icon.svg"
-                            onClick={() => handleNetworkSelected("rinkeby")} />
-                        <WalletOption 
-                            name="Ropsten Testnet"
-                            image="images/eth-icon.svg"
-                            onClick={() => handleNetworkSelected("ropsten")} />
-                        <WalletOption 
-                            name="Polygon"
-                            image="images/polygon-icon.svg"
-                            onClick={() => handleNetworkSelected("matic")} />
-                        <WalletOption 
-                            name="Mumbai Testnet"
-                            image="images/polygon-icon.svg"
-                            onClick={() => handleNetworkSelected("mumbai")} />
-                        <WalletOption 
-                            name="Binance Smart Chain"
-                            image="images/binance-icon.svg"
-                            onClick={() => handleNetworkSelected("bsc")} />
+                        { networks
+                            .filter(n => n.enabled)
+                            .map((n, index) => (
+                            <WalletOption 
+                                name={n.name}
+                                image={`images/${n.icon}`}
+                                onClick={() => handleNetworkSelected(n.code)} />
+                        )) }
                     </ModalBody>
                 </ModalContent>
             </>
@@ -194,6 +183,13 @@ export default function Wallets() {
                 isCentered>
                     {getWalletModalContent()}
             </Modal>
+            
+            <AlertMessage
+                isOpen={isWrongNetworkAlertOpen}
+                onClose={() => setIsWrongNetworkAlertOpen(false)}
+                title="Wrong Network"
+                message="Please connect to the appropriate Ethereum network." />
+
         </div>
       );
 }

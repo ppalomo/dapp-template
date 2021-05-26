@@ -23,7 +23,7 @@ import {
     Link,
 } from "react-router-dom";
 import { utils } from 'ethers';
-import { FaDiscord, FaMoon, FaSun, FaTwitter, FaBars } from 'react-icons/fa';
+import { FaDiscord, FaMoon, FaSun, FaTwitter, FaBars, FaUser } from 'react-icons/fa';
 import { truncate } from '../utils/stringsHelper';
 import useStore from '../store';
 import { topMenuItems } from '../data/menuItems';
@@ -115,11 +115,14 @@ export default function Header (props) {
                                     borderColor={borderColor}
                                     p={1.5} rounded="md"
                                     position="relative">
-                                    <Text
-                                        color={textColor}
-                                        fontSize="sm">                                    
-                                        {truncate(wallet, 15, '...')}
-                                    </Text>
+                                    <HStack>
+                                        <Text
+                                            color={textColor}
+                                            fontSize="sm">                                    
+                                            {truncate(wallet, 15, '...')}
+                                        </Text>
+                                        {/* <FaUser size={15}/> */}
+                                    </HStack>
                                 </Flex>
                             </HStack>
                         </Button>
