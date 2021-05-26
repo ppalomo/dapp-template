@@ -22,12 +22,11 @@ import {
 import {
     Link,
 } from "react-router-dom";
-import { ethers, utils, BigNumber } from 'ethers';
+import { utils } from 'ethers';
 import { FaDiscord, FaMoon, FaSun, FaTwitter, FaBars } from 'react-icons/fa';
 import { truncate } from '../utils/stringsHelper';
 import useStore from '../store';
 import { topMenuItems } from '../data/menuItems';
-import { networks } from '../data/networks';
 
 //#endregion
 
@@ -38,15 +37,9 @@ export default function Header (props) {
     const textColor = useColorModeValue("text.100", "text.900");
     const addressBg = useColorModeValue("border.100", "border.900");
 
-    // useEffect(async () => {
-    //     if (network == null || network == undefined) {
-    //         const networkItem = networks.find(i => i.code === "rinkeby");
-    //         setNetwork(networkItem);
-    //     }
-    // }, [network]);
-
     return(
         <>
+
             <Flex
                 display={{
                     base: "none",
@@ -179,7 +172,7 @@ export default function Header (props) {
                 zIndex="1"
                 display={{
                     base: "flex",
-                    md: "none",
+                    md: "flex",
                     xl: "none"
                 }}
                 as="header"
@@ -203,7 +196,7 @@ export default function Header (props) {
                         src={useColorModeValue("images/logo-light.png", "images/logo-dark.png")} 
                         w={{
                             base: "10rem", // 0-48em
-                            md: "20rem", // 48em-80em,
+                            md: "15rem", // 48em-80em,
                             xl: "15rem", // 80em+
                         }} 
                         objectFit="cover" />
@@ -241,7 +234,7 @@ export default function Header (props) {
                 zIndex="0"
                 display={{
                     base: "flex",
-                    md: "none",
+                    md: "flex",
                     xl: "none"
                 }}
                 as="header"
@@ -321,7 +314,6 @@ export default function Header (props) {
                     }
 
             </Flex>
-
 
         </>
     );
